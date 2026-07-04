@@ -3,6 +3,7 @@ package dev.lordyorden.as_no_phish_detector.ui.events
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.core.view.isVisible
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import dev.lordyorden.as_no_phish_detector.R
@@ -16,6 +17,8 @@ import java.util.Locale
 
 class CircleEventAdapter(
     private val onDetailsClick: (Event) -> Unit,
+    private val onBlockClick: (Event) -> Unit,
+    private val onResolveClick: (Event) -> Unit,
 ) : RecyclerView.Adapter<CircleEventAdapter.CircleEventViewHolder>() {
 
     private var events = emptyList<CircleEventUiItem>()
@@ -57,6 +60,12 @@ class CircleEventAdapter(
             binding.btnDetails.setOnClickListener {
                 getEvent(bindingAdapterPosition)?.let(onDetailsClick)
             }
+            binding.btnBlock.setOnClickListener {
+                getEvent(bindingAdapterPosition)?.let(onBlockClick)
+            }
+            binding.btnResolve.setOnClickListener {
+                getEvent(bindingAdapterPosition)?.let(onResolveClick)
+            }
         }
 
         fun bind(item: CircleEventUiItem) {
@@ -65,6 +74,21 @@ class CircleEventAdapter(
             binding.tvName.text = item.member.name
             binding.tvTime.text = formatTimestamp(event.timestamp.toLong())
             binding.llcAction.isVisible = event.requiresAction == true
+            binding.btnBlock.isEnabled = !item.isBlocked
+            binding.btnBlock.text = if (item.isBlocked) {
+                binding.root.context.getString(R.string.blocked)
+            } else {
+                binding.root.context.getString(R.string.block)
+            }
+            binding.btnBlock.backgroundTintList = ContextCompat.getColorStateList(
+                binding.root.context,
+                if (item.isBlocked) R.color.surface_text else R.color.tertiary
+            )
+            binding.btnResolve.text = if (item.isBlocked) {
+                binding.root.context.getString(R.string.release)
+            } else {
+                binding.root.context.getString(R.string.resolve_btn_text)
+            }
 
             event.packageName?.let {
                 ImageLoader.getInstance().loadAppIcon(it, binding.ivAppSource, R.drawable.ic_phone)

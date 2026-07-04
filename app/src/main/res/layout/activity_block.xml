@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/background"
+    android:padding="28dp">
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/iv_block_icon"
+        android:layout_width="72dp"
+        android:layout_height="72dp"
+        android:src="@drawable/ic_block"
+        android:tint="@color/protection_off"
+        app:layout_constraintBottom_toTopOf="@id/tv_blocked_title"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/tv_blocked_title"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:fontFamily="@font/plus_jakarta_sans"
+        android:gravity="center"
+        android:text="@string/blocked_app_title"
+        android:textColor="@color/primary"
+        android:textSize="28sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@id/tv_blocked_message"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/iv_block_icon" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/tv_blocked_message"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:fontFamily="@font/plus_jakarta_sans"
+        android:gravity="center"
+        android:text="@string/blocked_app_message"
+        android:textColor="@color/on_surface"
+        android:textSize="17sp"
+        app:layout_constraintBottom_toTopOf="@id/tv_blocked_package"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_blocked_title" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/tv_blocked_package"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="18dp"
+        android:fontFamily="@font/plus_jakarta_sans"
+        android:gravity="center"
+        android:textColor="@color/protection_off"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@id/tv_waiting_release"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_blocked_message"
+        tools:text="com.example.app" />
+
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/tv_waiting_release"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="28dp"
+        android:fontFamily="@font/plus_jakarta_sans"
+        android:gravity="center"
+        android:text="@string/waiting_for_circle_release"
+        android:textColor="@color/on_background"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_blocked_package" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

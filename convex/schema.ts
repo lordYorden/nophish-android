@@ -45,5 +45,17 @@ export default defineSchema({
     .index("byDate", ["timestamp"])
     .index("byUserAndDate", ["userId", "timestamp"])
     .index("byCircleAndDate", ["circleId", "timestamp"])
+    .index("byEventId", ["eventId"]),
+
+    tempAppBlocks: defineTable({
+        eventId: v.string(),
+        circleId: v.string(),
+        targetId: v.string(),
+        packageName: v.string(),
+        blockedBy: v.string(),
+        createdAt: v.number(),
+    })
     .index("byEventId", ["eventId"])
+    .index("byTargetAndPackage", ["targetId", "packageName"])
+    .index("byCircleAndCreatedAt", ["circleId", "createdAt"]),
 })

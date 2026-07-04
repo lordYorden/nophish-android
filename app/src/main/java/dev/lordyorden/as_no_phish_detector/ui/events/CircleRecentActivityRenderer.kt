@@ -46,7 +46,7 @@ class CircleRecentActivityRenderer(
                 renderMessage(context.getString(R.string.missing_for_event))
                 return
             }
-            CircleEventUiItem(event, member)
+            CircleEventUiItem(event, member, isBlocked = false)
         }
 
         adapter.submitList(previewItems)
