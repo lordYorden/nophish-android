@@ -53,7 +53,7 @@ class BlockActivity : AppCompatActivity() {
                     .collect { result ->
                         result.onSuccess { block ->
                             if (block == null) {
-                                finish()
+                                closeBlockerToPreviousTask()
                                 return@onSuccess
                             }
 
@@ -72,6 +72,11 @@ class BlockActivity : AppCompatActivity() {
                 throw error
             }
         }
+    }
+
+    private fun closeBlockerToPreviousTask() {
+        moveTaskToBack(true)
+        finish()
     }
 
     private fun requireIntentString(key: String): String {
