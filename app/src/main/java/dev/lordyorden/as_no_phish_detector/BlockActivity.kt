@@ -8,6 +8,7 @@ import androidx.lifecycle.lifecycleScope
 import dev.lordyorden.as_no_phish_detector.databinding.ActivityBlockBinding
 import dev.lordyorden.as_no_phish_detector.models.TempAppBlock
 import dev.lordyorden.as_no_phish_detector.utilities.ConvexHelper
+import dev.lordyorden.as_no_phish_detector.utilities.ImageLoader
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -24,7 +25,7 @@ class BlockActivity : AppCompatActivity() {
 
         binding = ActivityBlockBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        binding.tvBlockedPackage.text = packageName
+        ImageLoader.getInstance().loadAppIcon(packageName, binding.ivBlockedAppIcon)
 
         onBackPressedDispatcher.addCallback(
             this,

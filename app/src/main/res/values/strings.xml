@@ -123,9 +123,9 @@
     <string name="event_resolved">Event resolved</string>
     <string name="accessibility_service">App Blocking Accessibility Service</string>
     <string name="app_block_accessibility_description">Detects when a temporarily blocked app is opened.</string>
-    <string name="blocked_app_title">This app is temporarily blocked</string>
-    <string name="blocked_app_message">Your circle has blocked this app while they review the alert.</string>
-    <string name="waiting_for_circle_release">Waiting for your circle to release it.</string>
+    <string name="blocked_app_title">Temporarily blocked</string>
+    <string name="blocked_app_message">Your family circle has blocked this app while they review a suspicious alert.</string>
+    <string name="waiting_for_circle_release">Waiting for your circle to release it</string>
     <string name="general_error_redirect">Something went wrong, returning to login</string>
     <string name="profile_picture">Profile Picture</string>
     <string name="your_role">Your role</string>
