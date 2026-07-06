@@ -1,213 +1,175 @@
-# NoPhish App - SMS & Notification Phishing Detection (outdated)
+# NoPhish
 
-![NoPhish App Logo](./docs/ic_nophish.png)
+![Android](https://img.shields.io/badge/platform-Android-3DDC84?logo=android&logoColor=white)
+![Kotlin](https://img.shields.io/badge/Kotlin-2.3.20-7F52FF?logo=kotlin&logoColor=white)
+![Gradle](https://img.shields.io/badge/Gradle-8.11.2-02303A?logo=gradle&logoColor=white)
+![Min SDK](https://img.shields.io/badge/min%20SDK-26-blue)
+![Compile SDK](https://img.shields.io/badge/compile%20SDK-36-blue)
+![License](https://img.shields.io/badge/license-Apache%202.0-lightgrey)
 
-## Overview
+<img src="./docs/ic_nophish.png" alt="NoPhish logo" width="250">
 
-Phishing prevention tool for Android, as part of my Final Project.
+NoPhish is an Android security app for detecting phishing attempts in push notifications. It captures risky notification surfaces on-device, sends them to the NoPhish backend for analysis, records suspicious events, and gives a trusted family circle a way to review and respond.
 
-You can find the backend repo [here](https://github.com/lordYorden/NoPhish-server)
+Backend: [lordYorden/NoPhish-server](https://github.com/lordYorden/NoPhish-server)
 
-## Features
+## What It Does
 
-- **Real-time SMS Monitoring**: Automatically captures and analyzes incoming SMS messages
-- **Notification Monitoring**: Monitors push notifications from all installed apps
-- **Foreground Service**: Runs continuously in the background to ensure protection
-- **Data Upload**: Sends collected data to backend API for phishing analysis
-- **User-friendly Interface**: Simple navigation with multiple screens for different functionalities
+- Monitors notification content through Android notification listener access.
+- Uploads captured notification payloads through a foreground service.
+- Authenticates users with Clerk.
+- Stores member, circle, invite-code, event, and temporary block state in Convex.
+- Shows attack history, circle alerts, recent activity, and technical event details.
+- Sends malicious-event alerts through Firebase Cloud Messaging.
+- Lets circle members temporarily block and release the source app for a suspicious event.
+- Stores pending uploads and malicious-notification details in encrypted local DataStore.
 
-## App Architecture
+<img src="./docs/notif-service.jpg" alt="Foreground service notification" width="420">
 
-### Foreground Service Logic
+## Architecture
 
-The app uses a **Foreground Service** (`UploadForegroundService`) that runs continuously to:
+![NoPhish architecture](./docs/archi-v6.png)
 
-1. **Monitor incoming messages**: Captures SMS messages and notifications in real-time
-2. **Process data**: Extracts relevant information (sender, content, timestamp, package name)
-3. **Upload to API**: Sends data to the backend server for phishing analysis
-4. **Maintain persistence**: Keeps running even when the app is not in the foreground
+```text
+Android receivers/services
+  NotificationReceiverService
+  UploadForegroundService
+  FCMService
+  AppBlockAccessibilityService
 
-#### Service Workflow:
+Application state
+  Clerk auth
+  Convex client
+  CircleMembersRepository
+  ViewModels
+  Encrypted DataStore
 
-- Service starts when a new SMS or notification is received
-- Data is bundled and passed to the service
-- Service creates appropriate API calls (SMS or Notification endpoints)
-- Maintains a persistent notification to inform user of active protection
-![notif_s](./docs/notif-service.jpg)
-
-### Key Components:
-
-- **UploadForegroundService**: Main background service for data processing
-- **SmsBroadcastReceiver**: Captures incoming SMS messages
-- **NotificationReceiverService**: Monitors system notifications
-- **Retrofit Controllers**: Handle API communication (SmsController, NotificationController)
-
-## Permissions Required
-
-The app requires the following permissions for proper functionality:
-
-### Critical Permissions:
-
-- **`READ_SMS`** - Read incoming SMS messages for analysis
-- **`RECEIVE_SMS`** - Receive SMS message broadcasts
-- **`FOREGROUND_SERVICE`** - Run background monitoring service
-
-### Additional Permissions:
-
-- **`POST_NOTIFICATIONS`** - Display status notifications to user
-- **`RECEIVE_BOOT_COMPLETED`** - Auto-start protection after device reboot
-- **`QUERY_ALL_PACKAGES`** - Monitor notifications from all installed apps
-
-### Special Permissions:
-
-- **Notification Listener Service** - Required to monitor system notifications
-
-## App Screens
-
-The app features a bottom navigation interface with the following screens:
-
-### 1. **SMS Fragment**
-![sms](./docs/sms_fragment.jpg)
-
-- Displays collected SMS messages
-- Shows sender information and message content
-- Allows filtering by phone number
-- Pagination support for large datasets
-
-### 2. **Notifications Fragment**
-![notif_f](./docs/notif-fragment.jpg)
-
-- Lists monitored push notifications
-- Shows app package names and notification content
-- Real-time updates of incoming notifications
-
-### 3. **Settings Fragment**
-![settings](./docs/settings_fragment.jpg)
-
-- Permission management and status
-- Service configuration options
-- API endpoint configuration
-- App preferences and controls
-
-## Quick Start Guide
-
-### Prerequisites
-
-- Android device running API level 26 (Android 8.0) or higher
-- Internet connection for API communication
-
-### Installation & Setup
-
-1. **Install the APK**
-
-   - download in github release
-2. **Grant Required Permissions**
-
-   - Launch the app and goto settings screen
-   - Enable SMS and Notification permissions
-   - Grant notification access in settings screen
-3. **API Configuration**
-
-   - Update the API endpoint in `Constants.kt` (see configuration section below)
-   - Ensure backend server is running and accessible
-
-### Building from Source
-
-1. **Configure API Endpoint**
-
-   - Edit `app/src/main/java/dev/lordyorden/as_no_phish_detector/utilities/Constants.kt`
-   - Update the `BASE_URL` constant with your API endpoint
-2. **Open in Android Studio**
-
-   - Open Android Studio
-   - Select "Open an existing project"
-   - Navigate to the NoPhish-App folder
-   - Wait for Gradle sync to complete
-3. **Run the app**
-
-   - Connect your Android device or start an emulator
-   - Click the "Run" button (▶️) in Android Studio
-   - The app will be built and installed automatically
-
-## API Configuration
-
-### Setting up the Backend Endpoint
-
-To configure the API endpoint, modify the `Constants.kt` file:
-
-```kotlin
-// File: app/src/main/java/dev/lordyorden/as_no_phish_detector/utilities/Constants.kt
-
-class Constants {
-    object RestAPI{
-        const val BASE_URL = "YOUR_API_ENDPOINT_HERE"  // Replace with your server URL
-    }
-  
-    object Perms {
-        const val POST_NOTIFICATION_CODE = 42
-        const val READ_NOTIFICATION_CODE = 43
-        const val READ_SMS_CODE = 44
-    }
-}
+Remote systems
+  NoPhish REST API
+  Convex
+  Firebase Cloud Messaging
 ```
 
-### Local Development with ngrok (Recommended)
+The app has two main activity hosts:
 
-For local backend testing, we **highly recommend using ngrok** to expose your local server:
+- `MainActivity` handles the launch and onboarding flow.
+- `ClientActivity` hosts the signed-in client experience.
 
-* **Install ngrok** **from** [https://ngrok.com/download](https://ngrok.com/download)
-* **Start your Python backend server** (on port default 8000)
+Important packages:
 
-  ```bash
-  # Start the FastAPI/Uvicorn backend
-  uvicorn main:app
-  ```
-* **Copy ngrok start command**
+```text
+app/src/main/java/dev/lordyorden/as_no_phish_detector/
+  services/        Android background, receiver, FCM, and blocking services
+  ui/              Fragments, renderers, adapters, and view models
+  repositories/    Shared data repositories
+  retrofit/        REST API controllers
+  utilities/       Convex, notification, network, parser, and storage helpers
 
-  ```bash
-  ngrok http --url=abc123.ngrok-free.app 8000
-  ```
-* **Update Constants.kt with ngrok URL**
-* ```kotlin
-  const val BASE_URL = "https://abc123.ngrok-free.app"
-  ```
+convex/
+  schema.ts        Convex tables and indexes
+  members.ts       Member mutations and queries
+  circles.ts       Circle mutations and queries
+  events.ts        Malicious-event mutations and queries
+  otps.ts          Invite-code issue and redeem flow
+  blocks.ts        Temporary app-block mutations and queries
+```
 
-### API Endpoints
+## Tech Stack
 
-The app communicates with the following endpoints:
+- Kotlin and Android XML views
+- AndroidX Navigation, Lifecycle, WorkManager, and DataStore
+- Material Components
+- Retrofit, Gson, and ViewBinding
+- Clerk Android SDK
+- Convex Android client
+- Firebase Analytics and Firebase Messaging
+- Tink-backed encrypted DataStore
+- Protocol Buffers Kotlin lite
 
-- **POST `/messages`** - Upload SMS messages
-- **GET `/messages`** - Retrieve SMS messages (paginated)
-- **GET `/messages/{messageId}`** - Get specific SMS message
-- **GET `/messages/byNumber/{phoneNumber}`** - Get messages by phone number
-- **POST `/notifications`** - Upload notification data
+## Requirements
 
-### Backend Requirements
+- Android Studio
+- JDK 21
+- Android SDK 36
+- Android device or emulator running API 26+
+- `app/google-services.json` for Firebase
+- A reachable NoPhish REST backend
+- Access to the Clerk and Convex projects configured in this repository
 
-Your backend server should handle:
+## Configuration
 
-- SMS message data with fields: `address`, `body`, `timestamp`
-- Notification data with fields: `title`, `body`, `packageName`, `timestamp`
+The REST backend URL is provided to the Android app through the `REST_API_BASE_URL` Gradle property. The value is compiled into `BuildConfig.REST_API_BASE_URL` and read by `Constants.RestAPI.BASE_URL`.
 
-## Development Notes
+Add it to `local.properties` for local development:
 
-- Built with **Kotlin** and **Android SDK**
-- Uses **Retrofit** for API communication
-- Implements **Navigation Component** for UI navigation
-- **ViewBinding** for UI component access
-- **ViewModel** architecture for data management
+```properties
+REST_API_BASE_URL=https://your-api.example.com
+```
+
+Or pass it on the command line:
+
+```bash
+./gradlew assembleDebug -PREST_API_BASE_URL=https://your-api.example.com
+```
+
+If the property is not set, the Gradle build currently uses `https://localhost:9000`. The resolved value must not be blank.
+
+For physical-device testing against a backend running on your development machine, use `adb reverse` so the Android device can reach the host machine over the USB debug connection. Android documents `adb` in the [Android Debug Bridge docs](https://developer.android.com/tools/adb).
+
+```bash
+adb reverse tcp:9000 tcp:9000
+```
+
+```properties
+REST_API_BASE_URL=https://localhost:9000
+```
+
+For a self-hosted backend that should be reachable outside a USB-connected development session, publish it inside your tailnet with Tailscale. See the [Tailscale Services docs](https://tailscale.com/docs/features/tailscale-services).
+
+Project-specific service configuration currently lives in code:
+
+- Clerk publishable key: `app/src/main/java/dev/lordyorden/as_no_phish_detector/App.kt`
+- Convex deployment URL: `app/src/main/java/dev/lordyorden/as_no_phish_detector/utilities/ConvexHelper.kt`
+- Convex auth provider: `convex/auth.config.ts`
+
+For setting up a new Convex deployment, start with the [Convex docs](https://docs.convex.dev/home). For the Clerk integration used by this app, see the [Convex Clerk auth guide](https://docs.convex.dev/auth/clerk).
+
+## Build
+
+Build the debug APK:
+
+```bash
+./gradlew assembleDebug
+```
+
+Install on a connected device:
+
+```bash
+./gradlew installDebug
+```
+
+Run checks available through Gradle:
+
+```bash
+./gradlew check
+```
+
+## Data Flow
+
+1. The user signs in with Clerk.
+2. The app initializes a Clerk-authenticated Convex client.
+3. The user creates or joins a trusted circle.
+4. Notification content is captured by Android services.
+5. `UploadForegroundService` sends captured notification payloads to the REST backend.
+6. Malicious events are registered in Convex.
+7. History, circle alerts, and recent activity read event state from Convex.
+8. FCM delivers alert payloads to circle members.
+9. Circle members can temporarily block or release the source app.
 
 ## Troubleshooting
 
-### Common Issues:
-
-1. **Service not starting**: Check if all required permissions are granted
-2. **No data upload**: Verify API endpoint configuration and internet connectivity
-3. **Notifications not detected**: Ensure notification listener permission is enabled
-4. **SMS not captured**: Confirm SMS permissions are granted
-
-### Debug Steps:
-
-1. Verify service is running in Settings → Apps → NoPhish → Battery
-2. Test API connectivity manually
-3. Restart the service from app settings
+- Notification capture requires enabling NoPhish under Android notification listener settings.
+- Temporary app blocking requires enabling the NoPhish accessibility service.
+- Upload failures usually mean the device cannot reach `REST_API_BASE_URL`.
+- Authentication and circle failures usually point to Clerk or Convex configuration.
+- FCM delivery issues usually point to `app/google-services.json`, Firebase setup, or topic subscription failures.
