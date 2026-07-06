@@ -1,8 +1,10 @@
 package dev.lordyorden.as_no_phish_detector.ui.settings
 
+import android.content.ComponentName
 import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
+import android.provider.Settings
 import android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS
 import android.provider.Settings.ACTION_ACCESSIBILITY_SETTINGS
 import android.provider.Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS
@@ -15,8 +17,13 @@ import androidx.lifecycle.lifecycleScope
 import com.clerk.api.Clerk
 import com.vmadalin.easypermissions.EasyPermissions
 import com.vmadalin.easypermissions.models.PermissionRequest
+import dev.lordyorden.as_no_phish_detector.R
+import dev.lordyorden.as_no_phish_detector.databinding.BadgeActiveBinding
+import dev.lordyorden.as_no_phish_detector.databinding.BadgeDisabledBinding
 import dev.lordyorden.as_no_phish_detector.databinding.FragmentSettingsBinding
 import dev.lordyorden.as_no_phish_detector.repositories.CircleMembersRepository
+import dev.lordyorden.as_no_phish_detector.services.AppBlockAccessibilityService
+import dev.lordyorden.as_no_phish_detector.services.NotificationReceiverService
 import dev.lordyorden.as_no_phish_detector.services.UploadForegroundService
 import dev.lordyorden.as_no_phish_detector.utilities.Constants
 import dev.lordyorden.as_no_phish_detector.utilities.MaliciousNotificationStore
@@ -44,7 +51,6 @@ class SettingsFragment : Fragment() {
 
 
     private fun initViews() {
-
         binding.btnLogout.setOnClickListener {
             lifecycleScope.launch {
                 Clerk.auth.signOut()
@@ -71,14 +77,6 @@ class SettingsFragment : Fragment() {
                 requestPerm("android.permission.READ_SMS", Constants.Perms.READ_SMS_CODE)
         }
 
-        binding.readNotifBtn.setOnClickListener {
-            startActivity(Intent(ACTION_NOTIFICATION_LISTENER_SETTINGS))
-        }
-
-        binding.accessibilityBtn.setOnClickListener {
-            startActivity(Intent(ACTION_ACCESSIBILITY_SETTINGS))
-        }
-
 //        binding.readNotifMs.setOnCheckedChangeListener { _, isChecked ->
 //            if (isChecked)
 //                requestPerm("android.permission.BIND_NOTIFICATION_LISTENER_SERVICE", Constants.Perms.READ_NOTIFICATION_CODE)
@@ -98,6 +96,7 @@ class SettingsFragment : Fragment() {
             deniedPerm(reject)
         }
 
+        renderSystemConnectionStates()
     }
 
     override fun onResume() {
@@ -113,6 +112,8 @@ class SettingsFragment : Fragment() {
         if (EasyPermissions.hasPermissions(requireActivity(), "android.permission.BIND_NOTIFICATION_LISTENER_SERVICE")){
             activatePerm(Constants.Perms.READ_NOTIFICATION_CODE)
         }
+
+        renderSystemConnectionStates()
     }
 
 
@@ -156,6 +157,8 @@ class SettingsFragment : Fragment() {
                 //binding.postNotifMs.isActivated = false}
             }
         }
+
+        renderSystemConnectionStates()
     }
 
     private fun deniedPerm(requestCode: Int) {
@@ -184,6 +187,89 @@ class SettingsFragment : Fragment() {
             Constants.Perms.READ_NOTIFICATION_CODE -> {
                 startActivity(Intent(ACTION_NOTIFICATION_LISTENER_SETTINGS))
             }
+        }
+
+        renderSystemConnectionStates()
+    }
+
+    private fun renderSystemConnectionStates() {
+        renderConnectionAction(
+            enabled = isNotificationListenerEnabled(),
+            container = binding.readNotifActionContainer,
+            card = binding.scamMonitoringCard,
+            subtitle = binding.scamMonitoringSubtitle,
+            enabledSubtitle = getString(R.string.connected_securely),
+            disabledSubtitle = getString(R.string.tap_to_enable_monitoring),
+            onEnableClick = { startActivity(Intent(ACTION_NOTIFICATION_LISTENER_SETTINGS)) }
+        )
+        renderConnectionAction(
+            enabled = isAccessibilityServiceEnabled(),
+            container = binding.accessibilityActionContainer,
+            card = binding.safetyAssistantCard,
+            subtitle = binding.safetyAssistantSubtitle,
+            enabledSubtitle = getString(R.string.safety_assistant_active),
+            disabledSubtitle = getString(R.string.enable_safety_assistant),
+            onEnableClick = { startActivity(Intent(ACTION_ACCESSIBILITY_SETTINGS)) }
+        )
+    }
+
+    private fun renderConnectionAction(
+        enabled: Boolean,
+        container: ViewGroup,
+        card: View,
+        subtitle: com.google.android.material.textview.MaterialTextView,
+        enabledSubtitle: String,
+        disabledSubtitle: String,
+        onEnableClick: () -> Unit
+    ) {
+        container.removeAllViews()
+        subtitle.text = if (enabled) enabledSubtitle else disabledSubtitle
+        card.isClickable = true
+        card.isFocusable = true
+        card.setOnClickListener { onEnableClick() }
+
+        when (enabled) {
+            true -> {
+                val activeBadge = BadgeActiveBinding.inflate(
+                    LayoutInflater.from(container.context),
+                    container,
+                    false
+                )
+                container.addView(activeBadge.root)
+            }
+
+            false -> {
+                val disabledBadge = BadgeDisabledBinding.inflate(
+                    LayoutInflater.from(container.context),
+                    container,
+                    false
+                )
+                container.addView(disabledBadge.root)
+            }
+        }
+    }
+
+    private fun isNotificationListenerEnabled(): Boolean {
+        val enabledListeners = Settings.Secure.getString(
+            requireContext().contentResolver,
+            "enabled_notification_listeners"
+        ) ?: return false
+
+        val expectedComponent = ComponentName(requireContext(), NotificationReceiverService::class.java)
+        return enabledListeners.split(':').any { flattenedComponent ->
+            ComponentName.unflattenFromString(flattenedComponent) == expectedComponent
+        }
+    }
+
+    private fun isAccessibilityServiceEnabled(): Boolean {
+        val enabledServices = Settings.Secure.getString(
+            requireContext().contentResolver,
+            Settings.Secure.ENABLED_ACCESSIBILITY_SERVICES
+        ) ?: return false
+
+        val expectedComponent = ComponentName(requireContext(), AppBlockAccessibilityService::class.java)
+        return enabledServices.split(':').any { flattenedComponent ->
+            ComponentName.unflattenFromString(flattenedComponent) == expectedComponent
         }
     }
 }
