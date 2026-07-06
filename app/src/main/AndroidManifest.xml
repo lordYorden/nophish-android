@@ -66,7 +66,7 @@
             android:foregroundServiceType="specialUse" />
         <service
             android:name=".services.AppBlockAccessibilityService"
-            android:exported="false"
+            android:exported="true"
             android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
             <intent-filter>
                 <action android:name="android.accessibilityservice.AccessibilityService" />

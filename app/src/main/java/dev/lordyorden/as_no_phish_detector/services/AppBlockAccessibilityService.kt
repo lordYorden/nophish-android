@@ -25,7 +25,7 @@ class AppBlockAccessibilityService : AccessibilityService() {
         if (event.eventType != AccessibilityEvent.TYPE_WINDOW_STATE_CHANGED) return
 
         val packageName = event.packageName?.toString()
-        require(!packageName.isNullOrBlank()) { "Accessibility event packageName must not be blank" }
+        if (packageName.isNullOrBlank()) return
 
         if (packageName == applicationContext.packageName) {
             currentPackageName = null

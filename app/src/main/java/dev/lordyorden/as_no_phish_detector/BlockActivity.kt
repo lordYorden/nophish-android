@@ -1,5 +1,6 @@
 package dev.lordyorden.as_no_phish_detector
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.OnBackPressedCallback
@@ -25,7 +26,6 @@ class BlockActivity : AppCompatActivity() {
 
         binding = ActivityBlockBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        ImageLoader.getInstance().loadAppIcon(packageName, binding.ivBlockedAppIcon)
 
         onBackPressedDispatcher.addCallback(
             this,
@@ -34,12 +34,26 @@ class BlockActivity : AppCompatActivity() {
             }
         )
 
-        subscribeToBlock(eventId, packageName)
+        showBlock(eventId, packageName)
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+
+        val eventId = requireIntentString(EXTRA_EVENT_ID)
+        val packageName = requireIntentString(EXTRA_PACKAGE_NAME)
+        showBlock(eventId, packageName)
     }
 
     override fun onDestroy() {
         blockJob?.cancel()
         super.onDestroy()
+    }
+
+    private fun showBlock(eventId: String, packageName: String) {
+        ImageLoader.getInstance().loadAppIcon(packageName, binding.ivBlockedAppIcon)
+        subscribeToBlock(eventId, packageName)
     }
 
     private fun subscribeToBlock(eventId: String, packageName: String) {
@@ -58,12 +72,12 @@ class BlockActivity : AppCompatActivity() {
                                 return@onSuccess
                             }
 
-                            check(block.packageName == packageName) {
-                                "Block packageName mismatch for eventId=$eventId"
+                            if (block.packageName != packageName) {
+                                Log.e(TAG, "Block packageName mismatch for eventId=$eventId")
+                                closeBlockerToPreviousTask()
                             }
                         }.onFailure { error ->
                             Log.e(TAG, "Block subscription failed for eventId=$eventId", error)
-                            throw IllegalStateException("Block subscription failed", error)
                         }
                     }
             } catch (error: CancellationException) {
