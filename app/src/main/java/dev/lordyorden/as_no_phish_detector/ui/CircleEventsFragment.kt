@@ -63,6 +63,46 @@ class CircleEventsFragment : Fragment() {
                     val client = requireActivity() as ClientActivity
                     client.showDetailsBottomSheet(details)
                 }
+            },
+            onBlockClick = { event ->
+                viewLifecycleOwner.lifecycleScope.launch {
+                    runCatching {
+                        viewModel.blockEvent(event)
+                    }.onSuccess {
+                        Toast.makeText(
+                            requireContext(),
+                            getString(R.string.app_blocked),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }.onFailure { error ->
+                        Log.e(TAG, "Failed to block app for eventId=${event.eventId}", error)
+                        Toast.makeText(
+                            requireContext(),
+                            error.message ?: getString(R.string.circle_events_error),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
+            },
+            onResolveClick = { event ->
+                viewLifecycleOwner.lifecycleScope.launch {
+                    runCatching {
+                        viewModel.resolveEvent(event)
+                    }.onSuccess {
+                        Toast.makeText(
+                            requireContext(),
+                            getString(R.string.event_resolved),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }.onFailure { error ->
+                        Log.e(TAG, "Failed to resolve eventId=${event.eventId}", error)
+                        Toast.makeText(
+                            requireContext(),
+                            error.message ?: getString(R.string.circle_events_error),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
             }
         )
 

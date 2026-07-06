@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dev.convex.android.ConvexClient
 import dev.convex.android.WebSocketState
+import dev.lordyorden.as_no_phish_detector.models.CircleEvent
 import dev.lordyorden.as_no_phish_detector.models.Event
 import dev.lordyorden.as_no_phish_detector.models.PaginationResult
 import dev.lordyorden.as_no_phish_detector.repositories.CircleMembersRepository
@@ -34,7 +35,7 @@ class CircleEventsViewModel : ViewModel() {
     private var webSocketJob: Job? = null
     private var requestedItemCount = Constants.HistoryPagination.PAGE_SIZE
     private var circleId: String? = null
-    private var latestEvents = emptyList<Event>()
+    private var latestEvents = emptyList<CircleEvent>()
     private var circleMembersStateFlow: StateFlow<CircleMembersState>? = null
     private var alertScope = CircleAlertScope.ActionRequired
 
@@ -87,6 +88,24 @@ class CircleEventsViewModel : ViewModel() {
         subscribeToEvents(loading)
     }
 
+    suspend fun blockEvent(event: Event) {
+        require(event.eventId.isNotBlank()) { "eventId must not be blank" }
+
+        client.mutation<String>(
+            "blocks:blockFromEvent",
+            mapOf("eventId" to event.eventId),
+        )
+    }
+
+    suspend fun resolveEvent(event: Event) {
+        require(event.eventId.isNotBlank()) { "eventId must not be blank" }
+
+        client.mutation<Unit?>(
+            "blocks:releaseForEvent",
+            mapOf("eventId" to event.eventId),
+        )
+    }
+
     private fun observeMembers(circleId: String) {
         membersStateJob?.cancel()
         val membersStateFlow = circleMembersRepository.observe(circleId)
@@ -127,7 +146,7 @@ class CircleEventsViewModel : ViewModel() {
 
         eventsJob = viewModelScope.launch {
             try {
-                client.subscribe<PaginationResult<Event>>("events:get_by_circle", args).collect { result ->
+                client.subscribe<PaginationResult<CircleEvent>>("events:get_by_circle", args).collect { result ->
                     result.onSuccess { page ->
                         latestEvents = page.page
                         Log.d(TAG, "received ${page.page.size} circle events; isDone=${page.isDone}")
@@ -186,10 +205,10 @@ class CircleEventsViewModel : ViewModel() {
             return
         }
 
-        val items = latestEvents.map { event ->
-            val member = membersState.membersByUserId[event.userId]
+        val items = latestEvents.map { circleEvent ->
+            val member = membersState.membersByUserId[circleEvent.userId]
             if (member == null) {
-                val message = "Missing circle member for eventId=${event.eventId}"
+                val message = "Missing circle member for eventId=${circleEvent.eventId}"
                 Log.e(TAG, message)
                 _uiState.update {
                     it.copy(
@@ -201,7 +220,11 @@ class CircleEventsViewModel : ViewModel() {
                 }
                 return
             }
-            CircleEventUiItem(event, member)
+            CircleEventUiItem(
+                event = circleEvent.toEvent(),
+                member = member,
+                isBlocked = circleEvent.isBlocked,
+            )
         }
 
         _uiState.value = CircleEventsUiState(

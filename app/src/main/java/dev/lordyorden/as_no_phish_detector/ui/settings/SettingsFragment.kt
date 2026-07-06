@@ -4,6 +4,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings.ACTION_APPLICATION_DETAILS_SETTINGS
+import android.provider.Settings.ACTION_ACCESSIBILITY_SETTINGS
 import android.provider.Settings.ACTION_NOTIFICATION_LISTENER_SETTINGS
 import android.view.LayoutInflater
 import android.view.View
@@ -72,6 +73,10 @@ class SettingsFragment : Fragment() {
 
         binding.readNotifBtn.setOnClickListener {
             startActivity(Intent(ACTION_NOTIFICATION_LISTENER_SETTINGS))
+        }
+
+        binding.accessibilityBtn.setOnClickListener {
+            startActivity(Intent(ACTION_ACCESSIBILITY_SETTINGS))
         }
 
 //        binding.readNotifMs.setOnCheckedChangeListener { _, isChecked ->

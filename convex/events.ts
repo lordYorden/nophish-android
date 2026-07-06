@@ -1,7 +1,7 @@
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 import { paginationOptsValidator } from "convex/server";
-import { Id } from "./_generated/dataModel";
+import { assertCircleMember } from "./lib/auth";
 
 const LIMIT_CAP = 10
 
@@ -112,7 +112,25 @@ export const get_by_circle = query({
       );
     }
 
-    return await eventsQuery.order("desc").paginate(args.paginationOpts);
+    const page = await eventsQuery.order("desc").paginate(args.paginationOpts);
+    const eventsWithBlockState = await Promise.all(
+      page.page.map(async (event) => {
+        const activeBlock = await ctx.db
+          .query("tempAppBlocks")
+          .withIndex("byEventId", (q) => q.eq("eventId", event.eventId))
+          .first();
+
+        return {
+          ...event,
+          isBlocked: activeBlock !== null,
+        };
+      }),
+    );
+
+    return {
+      ...page,
+      page: eventsWithBlockState,
+    };
   },
 });
 
@@ -167,21 +185,3 @@ export const getByEventId = query({
     return event;
   },
 });
-
-async function assertCircleMember(ctx: any, circleId: string, userId: string) {
-  const ownedCircle = await ctx.db.get(circleId as Id<"cricle">);
-
-  if (ownedCircle?.ownerId === userId) {
-    return;
-  }
-
-  const membership = await ctx.db
-    .query("otpCodes")
-    .withIndex("byCircleId", (q: any) => q.eq("circleId", circleId))
-    .filter((q: any) => q.eq(q.field("memberId"), userId))
-    .first();
-
-  if (!membership) {
-    throw new Error("Not a member of this circle");
-  }
-}
