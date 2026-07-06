@@ -30,4 +30,5 @@
     <color name="surface_text">#AFAAA6</color> <!-- Slightly darker beige for cards -->
     <color name="on_surface">#3D3B38</color>
     <color name="outline">#85736E</color>
+    <color name="surface_stroke">#E4DCD5</color>
 </resources>

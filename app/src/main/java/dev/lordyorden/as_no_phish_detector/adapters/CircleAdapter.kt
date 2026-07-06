@@ -49,7 +49,7 @@ class CircleAdapter(
 
                 ImageLoader.getInstance().loadImage(avatarUrl ?: "", ivIcon, R.drawable.bg_circle_avatar_gray)
 
-                frameBadgeStatus.removeAllViews()
+/*                frameBadgeStatus.removeAllViews()
                 when(isConnected){
                     true -> {
                         root.alpha = 1f
@@ -63,7 +63,7 @@ class CircleAdapter(
                         val pendingBadge = BadgePendingBinding.inflate(LayoutInflater.from(root.context))
                         frameBadgeStatus.addView(pendingBadge.root)
                     }
-                }
+                }*/
             }
         }
     }

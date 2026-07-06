@@ -129,6 +129,23 @@
     <string name="general_error_redirect">Something went wrong, returning to login</string>
     <string name="profile_picture">Profile Picture</string>
     <string name="your_role">Your role</string>
+    <string name="security_settings_title">Security &amp; Settings</string>
+    <string name="security_settings_subtitle">Manage your protection preferences\nand connection to family members.</string>
+    <string name="active_protection">Active Protection</string>
+    <string name="allow_family_alerts">Allow Family\nAlerts</string>
+    <string name="allow_family_alerts_body">Send important safety notices to your trusted contacts.</string>
+    <string name="system_connections">System Connections</string>
+    <string name="scam_monitoring">Scam Monitoring</string>
+    <string name="connected_securely">Connected securely</string>
+    <string name="active_status">Active</string>
+    <string name="disabled_status">Disabled</string>
+    <string name="tap_to_enable_monitoring">Tap to enable monitoring</string>
+    <string name="safety_assistant">Safety Assistant</string>
+    <string name="safety_assistant_active">Protection enabled</string>
+    <string name="enable_safety_assistant">Tap to enable protection</string>
+    <string name="enable_now">Enable Now</string>
+    <string name="settings_sign_out">Sign Out</string>
+    <string name="active">active</string>
 
     <plurals name="history_results_plural">
         <item quantity="one">%d result</item>
