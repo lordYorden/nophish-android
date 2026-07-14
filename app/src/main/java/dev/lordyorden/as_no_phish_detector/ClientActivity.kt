@@ -75,7 +75,7 @@ class ClientActivity : AppCompatActivity(), EasyPermissions.RationaleCallbacks,
 
         navController.addOnDestinationChangedListener { _, destination, _ ->
             when (destination.id) {
-                R.id.nev_history, R.id.nev_circle_history -> {
+                R.id.nev_history, R.id.nev_circle_history, R.id.nev_settings-> {
                     binding.toolbar.visibility = View.GONE
                 }
 

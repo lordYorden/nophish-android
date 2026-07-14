@@ -9,5 +9,6 @@ data class RelentNotificationInfo(
     var packageName: String,
     var timestamp: Long,
     var contentHash: String,
-    var urls: List<String> = listOf()
+    var urls: List<String> = listOf(),
+    var allowExternalAnalysis: Boolean
 )

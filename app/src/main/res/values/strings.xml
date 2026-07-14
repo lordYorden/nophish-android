@@ -134,6 +134,8 @@
     <string name="active_protection">Active Protection</string>
     <string name="allow_family_alerts">Allow Family\nAlerts</string>
     <string name="allow_family_alerts_body">Send important safety notices to your trusted contacts.</string>
+    <string name="ai_security_analysis">AI Security Analysis</string>
+    <string name="ai_security_analysis_body">Use advanced AI to identify sophisticated phishing attempts in real-time.</string>
     <string name="system_connections">System Connections</string>
     <string name="scam_monitoring">Scam Monitoring</string>
     <string name="connected_securely">Connected securely</string>

@@ -31,7 +31,7 @@ class ConvexHelper private constructor(context: Context){
     init {
         contextRef.get()?.let { ctx ->
             convexClient = createClerkConvexClient("https://enchanted-mallard-804.convex.cloud", ctx)
-            initConvexLogging()
+            //initConvexLogging()
         }
     }
 

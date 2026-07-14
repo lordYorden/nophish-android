@@ -17,6 +17,7 @@ import dev.lordyorden.as_no_phish_detector.repositories.CircleMembersRepository
 import dev.lordyorden.as_no_phish_detector.retrofit.NotificationController
 import dev.lordyorden.as_no_phish_detector.retrofit.SmsController
 import dev.lordyorden.as_no_phish_detector.utilities.Constants
+import dev.lordyorden.as_no_phish_detector.utilities.AiSecurityAnalysisSettingsStore
 import dev.lordyorden.as_no_phish_detector.utilities.NotificationHelper
 import dev.lordyorden.as_no_phish_detector.utilities.PendingNotificationUploadStore
 import dev.lordyorden.as_no_phish_detector.utilities.SecureNotificationHelper
@@ -40,6 +41,7 @@ class UploadForegroundService : LifecycleService() {
     private val smsController: SmsController = SmsController()
     private val notificationController: NotificationController = NotificationController()
     private lateinit var pendingUploadStore: PendingNotificationUploadStore
+    private lateinit var aiSecurityAnalysisSettingsStore: AiSecurityAnalysisSettingsStore
     private var retryPendingUploadsJob: Job? = null
     private val flushMutex = Mutex()
 
@@ -48,6 +50,7 @@ class UploadForegroundService : LifecycleService() {
         Log.i(TAG, "onCreate: created()")
 
         pendingUploadStore = PendingNotificationUploadStore.getInstance(this)
+        aiSecurityAnalysisSettingsStore = AiSecurityAnalysisSettingsStore.getInstance(this)
         schedulePendingUploadRetry()
 
         lifecycleScope.launch {
@@ -213,6 +216,9 @@ class UploadForegroundService : LifecycleService() {
         upload: PendingNotificationUpload
     ): Boolean {
         val payload = upload.payload
+        val allowExternalAnalysis = aiSecurityAnalysisSettingsStore.isEnabled()
+        //val msgBody = if (allowExternalAnalysis) payload.body else ""
+
         val contentHash = SecureNotificationHelper.contentHash(
             eventId = payload.eventId,
             title = payload.title,
@@ -232,7 +238,8 @@ class UploadForegroundService : LifecycleService() {
             packageName = payload.packageName,
             timestamp = payload.timestamp,
             contentHash = contentHash,
-            urls = payload.urls
+            urls = payload.urls,
+            allowExternalAnalysis = allowExternalAnalysis
         )
 
         return try {

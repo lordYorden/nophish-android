@@ -141,6 +141,87 @@
             </androidx.constraintlayout.widget.ConstraintLayout>
         </com.google.android.material.card.MaterialCardView>
 
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/ai_security_analysis_card"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:minHeight="100dp"
+            app:cardBackgroundColor="@color/surface"
+            app:cardCornerRadius="36dp"
+            app:cardElevation="0dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/active_protection_card"
+            app:strokeWidth="0dp">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingStart="16dp"
+                android:paddingTop="17dp"
+                android:paddingEnd="12dp"
+                android:paddingBottom="16dp">
+
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/ai_security_analysis_icon_bg"
+                    android:layout_width="39dp"
+                    android:layout_height="39dp"
+                    app:cardBackgroundColor="@color/primary"
+                    app:cardCornerRadius="20dp"
+                    app:cardElevation="0dp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:strokeWidth="0dp">
+
+                    <androidx.appcompat.widget.AppCompatImageView
+                        android:layout_width="21dp"
+                        android:layout_height="21dp"
+                        android:layout_gravity="center"
+                        android:contentDescription="@string/ai_security_analysis"
+                        android:src="@drawable/ic_threat_intelligence"
+                        app:tint="@color/secondary_container" />
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/ai_security_analysis_title"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="10dp"
+                    android:layout_marginEnd="8dp"
+                    android:fontFamily="@font/plus_jakarta_sans"
+                    android:text="@string/ai_security_analysis"
+                    android:textColor="@color/on_background"
+                    android:textSize="15sp"
+                    android:textStyle="bold"
+                    app:layout_constraintEnd_toStartOf="@id/ai_security_analysis_switch"
+                    app:layout_constraintStart_toEndOf="@id/ai_security_analysis_icon_bg"
+                    app:layout_constraintTop_toTopOf="@id/ai_security_analysis_icon_bg" />
+
+                <com.google.android.material.textview.MaterialTextView
+                    android:id="@+id/ai_security_analysis_body"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:fontFamily="@font/plus_jakarta_sans"
+                    android:text="@string/ai_security_analysis_body"
+                    android:textColor="@color/on_surface"
+                    android:textSize="11sp"
+                    app:layout_constraintEnd_toEndOf="@id/ai_security_analysis_title"
+                    app:layout_constraintStart_toStartOf="@id/ai_security_analysis_title"
+                    app:layout_constraintTop_toBottomOf="@id/ai_security_analysis_title" />
+
+                <com.google.android.material.materialswitch.MaterialSwitch
+                    android:id="@+id/ai_security_analysis_switch"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:scaleX="0.85"
+                    android:scaleY="0.85"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="@id/ai_security_analysis_icon_bg" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </com.google.android.material.card.MaterialCardView>
+
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/system_connections_title"
             android:layout_width="0dp"
@@ -153,7 +234,7 @@
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/active_protection_card" />
+            app:layout_constraintTop_toBottomOf="@id/ai_security_analysis_card" />
 
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/scam_monitoring_card"
