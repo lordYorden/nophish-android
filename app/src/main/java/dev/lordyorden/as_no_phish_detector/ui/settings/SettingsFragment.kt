@@ -55,10 +55,10 @@ class SettingsFragment : Fragment() {
     private fun initViews() {
         aiSecurityAnalysisSettingsStore = AiSecurityAnalysisSettingsStore.getInstance(requireContext())
         binding.aiSecurityAnalysisSwitch.isEnabled = false
-        lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
             binding.aiSecurityAnalysisSwitch.isChecked = aiSecurityAnalysisSettingsStore.isEnabled()
             binding.aiSecurityAnalysisSwitch.setOnCheckedChangeListener { _, isChecked ->
-                lifecycleScope.launch {
+                viewLifecycleOwner.lifecycleScope.launch {
                     aiSecurityAnalysisSettingsStore.setEnabled(isChecked)
                 }
             }

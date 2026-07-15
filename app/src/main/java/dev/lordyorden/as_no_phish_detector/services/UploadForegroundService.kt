@@ -217,7 +217,6 @@ class UploadForegroundService : LifecycleService() {
     ): Boolean {
         val payload = upload.payload
         val allowExternalAnalysis = aiSecurityAnalysisSettingsStore.isEnabled()
-        //val msgBody = if (allowExternalAnalysis) payload.body else ""
 
         val contentHash = SecureNotificationHelper.contentHash(
             eventId = payload.eventId,
