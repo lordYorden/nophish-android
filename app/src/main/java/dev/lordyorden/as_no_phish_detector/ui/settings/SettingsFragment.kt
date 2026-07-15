@@ -26,6 +26,7 @@ import dev.lordyorden.as_no_phish_detector.services.AppBlockAccessibilityService
 import dev.lordyorden.as_no_phish_detector.services.NotificationReceiverService
 import dev.lordyorden.as_no_phish_detector.services.UploadForegroundService
 import dev.lordyorden.as_no_phish_detector.utilities.Constants
+import dev.lordyorden.as_no_phish_detector.utilities.AiSecurityAnalysisSettingsStore
 import dev.lordyorden.as_no_phish_detector.utilities.MaliciousNotificationStore
 import dev.lordyorden.as_no_phish_detector.utilities.PendingNotificationUploadStore
 import kotlinx.coroutines.launch
@@ -34,6 +35,7 @@ class SettingsFragment : Fragment() {
 
     private lateinit var binding: FragmentSettingsBinding
     private val permsViewModel: PermsViewModel by activityViewModels()
+    private lateinit var aiSecurityAnalysisSettingsStore: AiSecurityAnalysisSettingsStore
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -51,6 +53,18 @@ class SettingsFragment : Fragment() {
 
 
     private fun initViews() {
+        aiSecurityAnalysisSettingsStore = AiSecurityAnalysisSettingsStore.getInstance(requireContext())
+        binding.aiSecurityAnalysisSwitch.isEnabled = false
+        viewLifecycleOwner.lifecycleScope.launch {
+            binding.aiSecurityAnalysisSwitch.isChecked = aiSecurityAnalysisSettingsStore.isEnabled()
+            binding.aiSecurityAnalysisSwitch.setOnCheckedChangeListener { _, isChecked ->
+                viewLifecycleOwner.lifecycleScope.launch {
+                    aiSecurityAnalysisSettingsStore.setEnabled(isChecked)
+                }
+            }
+            binding.aiSecurityAnalysisSwitch.isEnabled = true
+        }
+
         binding.btnLogout.setOnClickListener {
             lifecycleScope.launch {
                 Clerk.auth.signOut()

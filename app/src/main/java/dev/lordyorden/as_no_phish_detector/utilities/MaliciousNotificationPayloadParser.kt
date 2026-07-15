@@ -17,7 +17,8 @@ object MaliciousNotificationPayloadParser {
             packageName = payload.requireString("packageName"),
             timestamp = payload.requireLong("timestamp"),
             contentHash = payload.requireString("contentHash"),
-            urls = payload.optionalStringList("urls")
+            urls = payload.optionalStringList("urls"),
+            allowExternalAnalysis = payload.requireBoolean("allowExternalAnalysis")
         )
     }
 
@@ -38,6 +39,15 @@ object MaliciousNotificationPayloadParser {
 
         return runCatching { element.asLong }
             .getOrElse { throw IllegalArgumentException("Invalid required long field: $fieldName", it) }
+    }
+
+    private fun JsonObject.requireBoolean(fieldName: String): Boolean {
+        val element = get(fieldName)
+        if (element == null || element.isJsonNull || !element.isJsonPrimitive || !element.asJsonPrimitive.isBoolean) {
+            throw IllegalArgumentException("Missing or invalid required boolean field: $fieldName")
+        }
+
+        return element.asBoolean
     }
 
     private fun JsonObject.optionalString(fieldName: String): String? {

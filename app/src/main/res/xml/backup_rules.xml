@@ -8,6 +8,7 @@
 <full-backup-content>
     <exclude domain="file" path="datastore/pending_notification_uploads.pb"/>
     <exclude domain="file" path="datastore/malicious_notification_details.pb"/>
+    <exclude domain="file" path="datastore/ai_security_analysis_settings.pb"/>
     <exclude domain="sharedpref" path="nophish_datastore_keyset_prefs.xml"/>
     <!--
    <include domain="sharedpref" path="."/>

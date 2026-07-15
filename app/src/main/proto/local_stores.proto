@@ -26,6 +26,10 @@ message PendingNotificationUploads {
   bool legacy_migration_complete = 2;
 }
 
+message AiSecurityAnalysisSettings {
+  bool enabled = 1;
+}
+
 message AttackDetailsRecord {
   string event_id = 1;
   string source_user_id = 2;
