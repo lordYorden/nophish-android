@@ -26,6 +26,14 @@ Backend: [lordYorden/NoPhish-server](https://github.com/lordYorden/NoPhish-serve
 
 <img src="./docs/notif-service.jpg" alt="Foreground service notification" width="420">
 
+## Book-to-Code Highlights
+
+1. **Capture and filter incoming notifications** — the [notification listener](https://github.com/lordYorden/nophish-android/blob/main/app/src/main/java/dev/lordyorden/as_no_phish_detector/services/NotificationReceiverService.kt#L22) ignores NoPhish and system notifications, extracts the title, body, timestamp, source package, and URLs, then forwards eligible notifications for analysis.
+2. **Prepare and send a privacy-controlled analysis payload** — the [foreground service](https://github.com/lordYorden/nophish-android/blob/main/app/src/main/java/dev/lordyorden/as_no_phish_detector/services/UploadForegroundService.kt#L114) creates the notification payload, associates it with the signed-in user and their circle, and queues a failed upload for retry. The user-controlled [security-analysis toggle](https://github.com/lordYorden/nophish-android/blob/main/app/src/main/java/dev/lordyorden/as_no_phish_detector/ui/settings/SettingsFragment.kt#L56) supplies `allowExternalAnalysis`, which the [upload request includes](https://github.com/lordYorden/nophish-android/blob/main/app/src/main/java/dev/lordyorden/as_no_phish_detector/services/UploadForegroundService.kt#L219).
+3. **Create a trusted close circle** — the [Android client](https://github.com/lordYorden/nophish-android/blob/main/app/src/main/java/dev/lordyorden/as_no_phish_detector/ui/CircleCreationFragment.kt#L48) calls the Convex [`circles:create` mutation](https://github.com/lordYorden/nophish-android/blob/main/convex/circles.ts#L7), then calls [`otps:issue`](https://github.com/lordYorden/nophish-android/blob/main/convex/otps.ts#L7) to create an invite code for trusted family members or friends.
+4. **Receive verified threat alerts** — the [FCM service](https://github.com/lordYorden/nophish-android/blob/main/app/src/main/java/dev/lordyorden/as_no_phish_detector/services/FCMService.kt#L23) parses a malicious-event payload, verifies its integrity hash, displays the threat notification, and records the event locally.
+5. **Temporarily block a risky source app** — a circle member uses the [Android block action](https://github.com/lordYorden/nophish-android/blob/main/app/src/main/java/dev/lordyorden/as_no_phish_detector/ui/events/CircleEventsViewModel.kt#L95) to call the Convex [`blocks:blockFromEvent` and `blocks:releaseForEvent` mutations](https://github.com/lordYorden/nophish-android/blob/main/convex/blocks.ts#L5); the target device [subscribes](https://github.com/lordYorden/nophish-android/blob/main/app/src/main/java/dev/lordyorden/as_no_phish_detector/services/AppBlockAccessibilityService.kt#L56) to [`blocks:getActiveForApp`](https://github.com/lordYorden/nophish-android/blob/main/convex/blocks.ts#L106) and presents the block screen when that package opens.
+
 ## Architecture
 
 ![NoPhish architecture](./docs/archi-v6.png)
@@ -55,7 +63,7 @@ The app has two main activity hosts:
 - `MainActivity` handles the launch and onboarding flow.
 - `ClientActivity` hosts the signed-in client experience.
 
-Important packages:
+### Project Layout
 
 ```text
 app/src/main/java/dev/lordyorden/as_no_phish_detector/
